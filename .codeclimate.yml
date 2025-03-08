@@ -1,0 +1,8 @@
+version: "2"
+engines:
+  eslint:
+    enabled: true
+  duplication:
+    enabled: true
+  test-reporter:
+    enabled: true
