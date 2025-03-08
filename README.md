@@ -6,3 +6,5 @@
 Aquí tienes un ejemplo de cómo funciona `page-loader`:
 
 [![asciinema](https://asciinema.org/a/6y493hscKXbbvjMTPqLKuYKag.svg)](https://asciinema.org/a/6y493hscKXbbvjMTPqLKuYKag)
+
+![image](https://github.com/user-attachments/assets/ede1c576-f516-430b-824a-33f09a6bc3b8)
