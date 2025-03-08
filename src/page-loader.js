@@ -6,83 +6,108 @@ import * as cheerio from "cheerio";
 
 /**
  * Genera un nombre de archivo válido basado en la URL.
- * @param {string} websiteUrl - URL de la página.
+ * @param {string} resourceUrl - URL del recurso.
  * @returns {string} - Nombre de archivo formateado correctamente.
  */
-const generateFilename = (websiteUrl) => {
-  const parsedUrl = new URL(websiteUrl);
+const generateResourceFilename = (resourceUrl) => {
+  const parsedUrl = new URL(resourceUrl);
+  const extension = path.extname(parsedUrl.pathname);
   let cleanUrl = `${parsedUrl.hostname}${parsedUrl.pathname}`
+    .replace(extension, "")
     .replace(/[^a-zA-Z0-9]/g, "-")
-    .replace(/-+$/, "");
+    .replace(/-+/g, "-")
+    .replace(/-$/, "");
 
-  return `${cleanUrl}.html`;
+  return cleanUrl + extension;
 };
 
 /**
- * Descarga y guarda una imagen en el directorio especificado.
- * @param {string} imgUrl - URL de la imagen.
- * @param {string} outputDir - Directorio de salida.
- * @param {string} baseUrl - URL base de la página.
- * @returns {Promise<string>} - Ruta del archivo de imagen descargado.
+ * Genera el nombre del directorio de recursos (`*_files`).
+ * @param {string} websiteUrl - URL de la página.
+ * @returns {string} - Nombre del directorio de recursos.
  */
-const downloadImage = (imgUrl, outputDir, baseUrl) => {
-  const absoluteUrl = new URL(imgUrl, baseUrl).href;
-  const imageExt = path.extname(imgUrl); // Extrae la extensión del archivo (.png, .jpg, etc.)
-  const imageName = absoluteUrl
-  .replace(/^https?:\/\//, "") // Elimina https:// o http://
-  .replace(/\.[a-zA-Z0-9]+$/, "") // Elimina la extensión del archivo temporalmente
-  .replace(/[^a-zA-Z0-9]/g, "-") // Reemplaza caracteres inválidos
-  + imageExt; // Vuelve a agregar la extensión original
+const generateAssetsDirName = (websiteUrl) => {
+  return generateResourceFilename(websiteUrl).replace(".html", "_files"); // ✅ Se asegura que termine en `_files`
+};
 
-  
-  const imagePath = path.join(outputDir, imageName);
+/**
+ * Descarga un recurso (CSS, JS, Imagen) y lo guarda en un directorio.
+ * @param {string} resourceUrl - URL del recurso.
+ * @param {string} outputDir - Directorio donde guardar el archivo.
+ * @param {string} baseUrl - URL base de la página.
+ * @returns {Promise<string | null>} - Ruta del archivo guardado o `null` si falla.
+ */
+const downloadResource = (resourceUrl, outputDir, baseUrl) => {
+  const absoluteUrl = new URL(resourceUrl, baseUrl).href;
+  const filename = generateResourceFilename(absoluteUrl);
+  const filePath = path.join(outputDir, filename);
 
   return axios({
     method: "get",
     url: absoluteUrl,
     responseType: "arraybuffer",
   })
-    .then((response) => fs.writeFile(imagePath, response.data))
-    .then(() => imagePath)
-    .catch((error) => console.error(`Error descargando imagen ${imgUrl}: ${error.message}`));
-};
-
-/**
- * Descarga una página web y sus imágenes asociadas.
- * @param {string} websiteUrl - URL de la página a descargar.
- * @param {string} outputDir - Directorio donde guardar la página y recursos.
- * @returns {Promise<string>} - Ruta completa del archivo HTML guardado.
- */
-const pageLoader = (websiteUrl, outputDir = process.cwd()) => {
-  const filename = generateFilename(websiteUrl);
-  const filePath = path.join(outputDir, filename);
-  const assetsDir = filePath.replace(".html", "_files");
-
-  return axios
-    .get(websiteUrl)
-    .then((response) => {
-      return fs.mkdir(assetsDir, { recursive: true }).then(() => response.data);
-    })
-    .then((html) => {
-      const $ = cheerio.load(html);
-
-      const imagePromises = $("img").map((_, img) => {
-        const imgSrc = $(img).attr("src");
-        if (imgSrc) {
-          return downloadImage(imgSrc, assetsDir, websiteUrl).then((imgPath) => {
-            $(img).attr("src", path.relative(outputDir, imgPath));
-          });
-        }
-      }).get();
-
-      return Promise.all(imagePromises).then(() => $.html());
-    })
-    .then((updatedHtml) => fs.writeFile(filePath, updatedHtml, "utf-8"))
-    .then(() => filePath)
+    .then((response) => fs.writeFile(filePath, response.data).then(() => filePath))
     .catch((error) => {
-      throw new Error(`Error al descargar la página: ${error.message}`);
+      console.error(`Error descargando recurso ${resourceUrl}: ${error.message}`);
+      return null;
     });
 };
 
-export default pageLoader;
+/**
+ * Descarga una página web y todos sus recursos locales.
+ * @param {string} websiteUrl - URL de la página a descargar.
+ * @param {string} outputDir - Directorio donde guardar los archivos.
+ * @returns {Promise<string>} - Ruta completa del archivo HTML guardado.
+ */
+const pageLoader = (websiteUrl, outputDir = process.cwd()) => {
+    const parsedWebsiteUrl = new URL(websiteUrl);
+    const htmlExtension = path.extname(parsedWebsiteUrl.pathname) || ".html";
+    const baseFilename = generateResourceFilename(websiteUrl).replace(htmlExtension, "");
+    const htmlFilename = `${baseFilename}.html`;
+    const filePath = path.join(outputDir, htmlFilename);
+    const assetsDir = path.join(outputDir, `${baseFilename}_files`); // Asegurar que es `${baseFilename}_files`
+  
+    return axios
+      .get(websiteUrl)
+      .then((response) => fs.mkdir(assetsDir, { recursive: true }).then(() => response.data))
+      .then((html) => {
+        const $ = cheerio.load(html);
+        const selectors = ["img", "link[rel='stylesheet']", "script[src]"];
+        const resourcePromises = [];
+        const elements = [];
+  
+        selectors.forEach((selector) => {
+          $(selector).each((_, element) => {
+            const tagName = element.name;
+            const attr = tagName === 'link' ? 'href' : 'src';
+            const resourceUrl = $(element).attr(attr);
+  
+            if (resourceUrl && new URL(resourceUrl, websiteUrl).origin === parsedWebsiteUrl.origin) {
+              elements.push({ element, attr });
+              const resourcePromise = downloadResource(resourceUrl, assetsDir, websiteUrl);
+              resourcePromises.push(resourcePromise);
+            }
+          });
+        });
+  
+        return Promise.all(resourcePromises).then((resourcePaths) => {
+          resourcePaths.forEach((resourcePath, index) => {
+            if (resourcePath) {
+              // Normalizar la ruta para usar siempre /
+              const relativePath = path.relative(path.dirname(filePath), resourcePath)
+                .replace(/\\/g, '/'); // Reemplazar backslashes en Windows
+              $(elements[index].element).attr(elements[index].attr, relativePath);
+            }
+          });
+          return $.html();
+        });
+      })
+      .then((updatedHtml) => fs.writeFile(filePath, updatedHtml, "utf-8"))
+      .then(() => filePath)
+      .catch((error) => {
+        throw new Error(`Error al descargar la página: ${error.message}`);
+      });
+  };
 
+export default pageLoader;
