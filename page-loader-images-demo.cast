@@ -1,0 +1,9 @@
+{"version": 2, "width": 61, "height": 10, "timestamp": 1741396093, "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
+[0.846402, "o", "\u001b[?2004h\u001b]0;sudoadduser@FQuinteros: ~/Documentos/fullstack-javascript-project-138\u0007\u001b[01;32msudoadduser@FQuinteros\u001b[00m:\u001b[01;34m~/Documentos/fullstack-javascript-project-138\u001b[00m$ "]
+[4.533757, "o", "\u001b[7mpage-loader --output /var/tmp https://codica.la/curs\u001b[27m\u001b[7mo\u001b[27m\u001b[7ms\u0000\u001b[27m\r\n\r"]
+[5.541153, "o", "\u001b[A\u001b[A\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[Cpage-loader --output /var/tmp https://codica.la/cursos\r\n\r\u001b[A\r\n"]
+[5.541335, "o", "\u001b[?2004l\r"]
+[6.591007, "o", "Archivo guardado en: /var/tmp/codica-la-cursos.html\r\n"]
+[6.595536, "o", "\u001b[?2004h\u001b]0;sudoadduser@FQuinteros: ~/Documentos/fullstack-javascript-project-138\u0007\u001b[01;32msudoadduser@FQuinteros\u001b[00m:\u001b[01;34m~/Documentos/fullstack-javascript-project-138\u001b[00m$ "]
+[11.893798, "o", "\u001b[?2004l\r\r\n"]
+[11.894132, "o", "exit\r\n"]
