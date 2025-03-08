@@ -2,6 +2,7 @@ import axios from "axios";
 import { promises as fs } from "fs";
 import path from "path";
 import { URL } from "url";
+import * as cheerio from "cheerio";
 
 /**
  * Genera un nombre de archivo válido basado en la URL.
@@ -10,36 +11,77 @@ import { URL } from "url";
  */
 const generateFilename = (websiteUrl) => {
   const parsedUrl = new URL(websiteUrl);
+  let cleanUrl = `${parsedUrl.hostname}${parsedUrl.pathname}`
+    .replace(/[^a-zA-Z0-9]/g, "-")
+    .replace(/-+$/, "");
 
-  // 🔹 Eliminar el protocolo (https:// o http://)
-  let cleanUrl = `${parsedUrl.hostname}${parsedUrl.pathname}`;
-
-  // 🔹 Reemplazar todos los caracteres que no sean letras o números por '-'
-  cleanUrl = cleanUrl.replace(/[^a-zA-Z0-9]/g, "-").replace(/-+$/, "");
-
-  // 🔹 Agregar extensión .html al final
   return `${cleanUrl}.html`;
 };
 
 /**
- * Descarga una página web y la guarda en un directorio especificado.
- * @param {string} websiteUrl - URL de la página a descargar.
- * @param {string} outputDir - Directorio donde guardar el archivo.
- * @returns {Promise<string>} - Ruta completa del archivo guardado.
+ * Descarga y guarda una imagen en el directorio especificado.
+ * @param {string} imgUrl - URL de la imagen.
+ * @param {string} outputDir - Directorio de salida.
+ * @param {string} baseUrl - URL base de la página.
+ * @returns {Promise<string>} - Ruta del archivo de imagen descargado.
  */
-const pageLoader = async (websiteUrl, outputDir = process.cwd()) => {
-  try {
-    const filename = generateFilename(websiteUrl);
-    const filePath = path.join(outputDir, filename);
+const downloadImage = (imgUrl, outputDir, baseUrl) => {
+  const absoluteUrl = new URL(imgUrl, baseUrl).href;
+  const imageExt = path.extname(imgUrl); // Extrae la extensión del archivo (.png, .jpg, etc.)
+  const imageName = absoluteUrl
+  .replace(/^https?:\/\//, "") // Elimina https:// o http://
+  .replace(/\.[a-zA-Z0-9]+$/, "") // Elimina la extensión del archivo temporalmente
+  .replace(/[^a-zA-Z0-9]/g, "-") // Reemplaza caracteres inválidos
+  + imageExt; // Vuelve a agregar la extensión original
 
-    // 🔹 Descargar la página
-    const response = await axios.get(websiteUrl);
-    await fs.writeFile(filePath, response.data, "utf-8");
+  
+  const imagePath = path.join(outputDir, imageName);
 
-    return filePath;
-  } catch (error) {
-    throw new Error(`Error al descargar la página: ${error.message}`);
-  }
+  return axios({
+    method: "get",
+    url: absoluteUrl,
+    responseType: "arraybuffer",
+  })
+    .then((response) => fs.writeFile(imagePath, response.data))
+    .then(() => imagePath)
+    .catch((error) => console.error(`Error descargando imagen ${imgUrl}: ${error.message}`));
+};
+
+/**
+ * Descarga una página web y sus imágenes asociadas.
+ * @param {string} websiteUrl - URL de la página a descargar.
+ * @param {string} outputDir - Directorio donde guardar la página y recursos.
+ * @returns {Promise<string>} - Ruta completa del archivo HTML guardado.
+ */
+const pageLoader = (websiteUrl, outputDir = process.cwd()) => {
+  const filename = generateFilename(websiteUrl);
+  const filePath = path.join(outputDir, filename);
+  const assetsDir = filePath.replace(".html", "_files");
+
+  return axios
+    .get(websiteUrl)
+    .then((response) => {
+      return fs.mkdir(assetsDir, { recursive: true }).then(() => response.data);
+    })
+    .then((html) => {
+      const $ = cheerio.load(html);
+
+      const imagePromises = $("img").map((_, img) => {
+        const imgSrc = $(img).attr("src");
+        if (imgSrc) {
+          return downloadImage(imgSrc, assetsDir, websiteUrl).then((imgPath) => {
+            $(img).attr("src", path.relative(outputDir, imgPath));
+          });
+        }
+      }).get();
+
+      return Promise.all(imagePromises).then(() => $.html());
+    })
+    .then((updatedHtml) => fs.writeFile(filePath, updatedHtml, "utf-8"))
+    .then(() => filePath)
+    .catch((error) => {
+      throw new Error(`Error al descargar la página: ${error.message}`);
+    });
 };
 
 export default pageLoader;
