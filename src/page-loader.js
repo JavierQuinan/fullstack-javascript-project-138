@@ -5,7 +5,10 @@ import url from "url";
 
 const pageLoader = async (websiteUrl, outputDir = process.cwd()) => {
   const parsedUrl = new URL(websiteUrl);
-  const filename = `${parsedUrl.hostname.replace(/\W/g, "-")}${parsedUrl.pathname.replace(/\W/g, "-")}.html`;
+  const filename = `${parsedUrl.hostname}${parsedUrl.pathname}`
+  .replace(/[^a-zA-Z0-9]/g, "-")
+  .replace(/-+$/, "") // 🔹 Elimina guiones finales
+  + ".html";
   const filePath = path.join(outputDir, filename);
 
   try {

@@ -11,12 +11,15 @@ describe("Page Loader", () => {
   });
 
   test("Debe descargar una página y guardarla", async () => {
-    const url = "https://example.com"; // URL de prueba válida
+    const url = "https://example.com";
+    const expectedFilename = "example-com.html";
     const filePath = await pageLoader(url, tempDir);
+
+    expect(path.basename(filePath)).toBe(expectedFilename);
     const fileContent = await fs.readFile(filePath, "utf-8");
 
-    expect(filePath).toMatch(/example-com.html$/);
     expect(fileContent).toContain("<html>");
   });
 });
+
 
