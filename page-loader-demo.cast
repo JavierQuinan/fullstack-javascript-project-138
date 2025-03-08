@@ -1,8 +1,7 @@
-{"version": 2, "width": 61, "height": 10, "timestamp": 1741394511, "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
-[0.275479, "o", "\u001b[?2004h\u001b]0;sudoadduser@FQuinteros: ~/Documentos/fullstack-javascript-project-138\u0007\u001b[01;32msudoadduser@FQuinteros\u001b[00m:\u001b[01;34m~/Documentos/fullstack-javascript-project-138\u001b[00m$ "]
-[5.698823, "o", "\u001b[7mpage-loader --output /var/tmp https://example.com\u001b[27m\r\n\r"]
-[6.710173, "o", "\u001b[A\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[Cpage-loader --output /var/tmp https://example.com\r\n"]
-[6.710385, "o", "\r\u001b[A\r\n\u001b[?2004l\r"]
-[7.343696, "o", "Archivo guardado en: /var/tmp/example-com.html\r\n"]
-[7.347332, "o", "\u001b[?2004h\u001b]0;sudoadduser@FQuinteros: ~/Documentos/fullstack-javascript-project-138\u0007\u001b[01;32msudoadduser@FQuinteros\u001b[00m:\u001b[01;34m~/Documentos/fullstack-javascript-project-138\u001b[00m$ "]
-[14.516144, "o", "\u001b[?2004l\r\r\nexit\r\n"]
+{"version": 2, "width": 61, "height": 10, "timestamp": 1741394892, "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
+[0.376759, "o", "\u001b[?2004h\u001b]0;sudoadduser@FQuinteros: ~/Documentos/fullstack-javascript-project-138\u0007\u001b[01;32msudoadduser@FQuinteros\u001b[00m:\u001b[01;34m~/Documentos/fullstack-javascript-project-138\u001b[00m$ "]
+[18.043233, "o", "\u001b[7mpage-loader --output /var/tmp https://codica.la/curs\u001b[27m\u001b[7mo\u001b[27m\u001b[7ms\u0000\u001b[27m\r\n\r"]
+[19.008559, "o", "\u001b[A\u001b[A\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[Cpage-loader --output /var/tmp https://codica.la/cursos\r\n\r\u001b[A\r\n\u001b[?2004l\r"]
+[19.969823, "o", "Archivo guardado en: /var/tmp/codica-la-cursos.html\r\n"]
+[19.973563, "o", "\u001b[?2004h\u001b]0;sudoadduser@FQuinteros: ~/Documentos/fullstack-javascript-project-138\u0007\u001b[01;32msudoadduser@FQuinteros\u001b[00m:\u001b[01;34m~/Documentos/fullstack-javascript-project-138\u001b[00m$ "]
+[27.874718, "o", "\u001b[?2004l\r\r\nexit\r\n"]
