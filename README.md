@@ -23,11 +23,15 @@ Este proyecto usa la biblioteca [`debug`](https://www.npmjs.com/package/debug) p
 
 [![asciinema](https://asciinema.org/a/Tfr7ocBnCAWlRqIesfuohb3sx.svg)](https://asciinema.org/a/Tfr7ocBnCAWlRqIesfuohb3sx)
 
-```bash
-DEBUG=page-loader,axios,nock.* npm test
+## 📉 Ejemplo de Ejecución con Error
 
-## Ejemplo de Error en la Ejecución
+Este proyecto incluye manejo de errores para situaciones como:
 
-Este proyecto maneja errores de red y de sistema de archivos. A continuación, se muestra una ejecución donde ocurre un error:
+- Respuestas HTTP diferentes a **200** (por ejemplo, error **404**).
+- Problemas de red o errores de **permisos al escribir archivos**.
 
-[![asciicast](https://asciinema.org/a/P5fEroeHCnoqh26Fno9jL2Amb.svg)](https://asciinema.org/a/P5fEroeHCnoqh26Fno9jL2Amb)
+🎥 A continuación, se muestra un ejemplo real grabado con Asciinema donde ocurren errores al ejecutar el comando:
+
+[![asciinema](https://asciinema.org/a/P5fEroeHCnoqh26Fno9jL2Amb.svg)](https://asciinema.org/a/P5fEroeHCnoqh26Fno9jL2Amb)
+
+
