@@ -57,9 +57,15 @@ const downloadAsset = (dirname, { url, filename }) => {
 // 🔹 Función principal para descargar una página
 const downloadPage = async (pageUrl, outputDirName = '') => {
   outputDirName = sanitizeOutputDir(outputDirName);
-
   log('url', pageUrl);
   log('output', outputDirName);
+
+  // ✅ Verifica si el directorio existe antes de continuar
+  try {
+    await fs.access(outputDirName);
+  } catch (error) {
+    throw new Error(`El directorio ${outputDirName} no existe`);
+  }
 
   const url = new URL(pageUrl);
   const slug = `${url.hostname}${url.pathname}`;
