@@ -7,90 +7,94 @@ import debug from 'debug';
 import _ from 'lodash';
 import { Listr } from 'listr2';
 import {
-  urlToFilename, urlToDirname, getExtension, sanitizeOutputDir,
+  urlToFilename,
+  urlToDirname,
+  getExtension,
+  sanitizeOutputDir,
 } from './utils.js';
 
 const log = debug('page-loader');
 
 // 🔹 Procesa y reemplaza las URLs de recursos dentro del HTML
-const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets) => {
+const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets, slug) => {
   const $elements = $(tagName).toArray();
   const elementsWithUrls = $elements
     .map((element) => $(element))
     .filter(($element) => $element.attr(attrName))
-    .map(($element) => {
-      try {
-        const absoluteUrl = new URL($element.attr(attrName), baseUrl);
-        return { $element, url: absoluteUrl };
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean)
-    .filter(({ url }) => url.origin === baseUrl.origin);
+    .map(($element) => ({ $element, url: new URL($element.attr(attrName), baseUrl) }))
+    .filter(({ url }) => url.origin === baseUrl);
 
   elementsWithUrls.forEach(({ $element, url }) => {
-    const slug = urlToFilename(`${url.hostname}${url.pathname}`);
-    const localPath = path.join(baseDirname, slug);
-    assets.push({ url, filename: slug });
-    $element.attr(attrName, localPath);
+    const fullUrlPath = `${url.hostname}${url.pathname}`;
+    const filename = urlToFilename(fullUrlPath);
+    const filepath = path.join(baseDirname, filename);
+    assets.push({ url, filename });
+    $element.attr(attrName, filepath);
   });
 };
 
 // 🔹 Obtiene y procesa todos los recursos del HTML
-const processResources = (baseUrl, baseDirname, html) => {
+const processResources = (baseUrl, baseDirname, html, slug) => {
   const $ = cheerio.load(html, { decodeEntities: false });
   const assets = [];
 
-  processResource($, 'img', 'src', baseUrl, baseDirname, assets);
-  processResource($, 'link', 'href', baseUrl, baseDirname, assets);
-  processResource($, 'script', 'src', baseUrl, baseDirname, assets);
+  processResource($, 'img', 'src', baseUrl, baseDirname, assets, slug);
+  processResource($, 'link', 'href', baseUrl, baseDirname, assets, slug);
+  processResource($, 'script', 'src', baseUrl, baseDirname, assets, slug);
 
   return { html: $.html(), assets };
 };
 
-// 🔹 Descarga un recurso individual
 const downloadAsset = (dirname, { url, filename }) =>
-  axios.get(url.toString(), { responseType: 'arraybuffer' })
-    .then((response) => {
-      const fullPath = path.join(dirname, filename);
-      return fs.writeFile(fullPath, response.data);
-    });
+  axios.get(url.toString(), { responseType: 'arraybuffer' }).then((response) => {
+    const fullPath = path.join(dirname, filename);
+    return fs.writeFile(fullPath, response.data);
+  });
 
 // 🔹 Función principal
 const downloadPage = async (pageUrl, outputDirName = '') => {
   outputDirName = sanitizeOutputDir(outputDirName);
 
   log('url', pageUrl);
-  log('output', outputDirName);
 
   const url = new URL(pageUrl);
   const slug = `${url.hostname}${url.pathname}`;
   const filename = urlToFilename(slug);
-  const fullOutputDirname = path.resolve(process.cwd(), outputDirName);
   const extension = getExtension(filename) === '.html' ? '' : '.html';
+  const fullOutputDirname = path.resolve(process.cwd(), outputDirName);
   const fullOutputFilename = path.join(fullOutputDirname, `${filename}${extension}`);
   const assetsDirname = urlToDirname(slug);
   const fullOutputAssetsDirname = path.join(fullOutputDirname, assetsDirname);
 
+  // Verificar que el directorio de salida existe
+  try {
+    await fs.access(fullOutputDirname);
+  } catch (e) {
+    throw new Error(`❌ No se puede acceder al directorio: ${fullOutputDirname}`);
+  }
+
+  log('output', fullOutputDirname);
+
   let data;
 
-  await fs.access(fullOutputDirname).catch(() => fs.mkdir(fullOutputDirname, { recursive: true }));
-
   const html = await axios.get(pageUrl).then((res) => res.data);
-  data = processResources(url, assetsDirname, html); // url completo
+  data = processResources(url, assetsDirname, html, slug);
 
-  await fs.access(fullOutputDirname);
+  await fs.mkdir(fullOutputAssetsDirname, { recursive: true });
   await fs.writeFile(fullOutputFilename, data.html);
 
   const tasks = data.assets.map((asset) => ({
     title: asset.url.toString(),
-    task: () => downloadAsset(fullOutputAssetsDirname, asset).catch(_.noop),
+    task: () =>
+      downloadAsset(fullOutputAssetsDirname, asset).catch((e) => {
+        log(`⚠️ No se pudo descargar ${asset.url.toString()}: ${e.message}`);
+      }),
   }));
 
   const listr = new Listr(tasks, { concurrent: true });
   await listr.run();
 
+  log(`✅ Archivo HTML guardado en: ${fullOutputFilename}`);
   return { filepath: fullOutputFilename };
 };
 
