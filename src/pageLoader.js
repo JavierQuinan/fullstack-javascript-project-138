@@ -1,33 +1,43 @@
+import { promises as fs, constants } from 'fs';
 import path from 'path';
-import { URL } from 'url';
-import { access, writeFile, mkdir } from 'fs/promises';
-import { constants } from 'fs';
 import axios from 'axios';
+import * as cheerio from 'cheerio';
+import { createWriteStream } from 'fs';
+import { pipeline } from 'stream/promises';
+import { mkdir, access } from 'fs/promises';
 import Listr from 'listr';
-import debug from 'debug';
+import debugLib from 'debug';
 
-const log = debug('page-loader');
+const debug = debugLib('page-loader');
 
 const getFileNameFromUrl = (url) => {
-  const { host, pathname } = new URL(url);
-  const cleanPath = pathname === '/' ? '' : pathname;
-  const name = `${host}${cleanPath}`.replace(/[^a-zA-Z0-9]/g, '-');
-  return `${name}.html`;
+  const { hostname, pathname } = new URL(url);
+  const cleanPath = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+  const fullPath = path.join(hostname, cleanPath);
+  return `${fullPath.replace(/[^a-zA-Z0-9]/g, '-')}.html`;
 };
 
-const getResourcesFolderName = (url) => {
-  const { host, pathname } = new URL(url);
-  const cleanPath = pathname === '/' ? '' : pathname;
-  const name = `${host}${cleanPath}`.replace(/[^a-zA-Z0-9]/g, '-');
-  return `${name}_files`;
+const getResourceName = (url) => {
+  const { hostname, pathname } = new URL(url);
+  return `${path.join(hostname, pathname).replace(/[^a-zA-Z0-9]/g, '-')}`;
 };
 
-const downloadResource = (resourceUrl, outputPath) => axios
-  .get(resourceUrl, { responseType: 'arraybuffer' })
-  .then((res) => writeFile(outputPath, res.data));
+const isLocalResource = (link, baseUrl) => {
+  try {
+    const url = new URL(link, baseUrl);
+    return url.origin === new URL(baseUrl).origin;
+  } catch {
+    return false;
+  }
+};
+
+const downloadResource = async (resourceUrl, outputPath) => {
+  const response = await axios.get(resourceUrl, { responseType: 'stream' });
+  await pipeline(response.data, createWriteStream(outputPath));
+};
 
 const pageLoader = async (url, outputDir = process.cwd()) => {
-  log(`Iniciando descarga de: ${url}`);
+  debug(`Iniciando descarga de: ${url}`);
 
   try {
     await access(outputDir, constants.F_OK);
@@ -36,67 +46,79 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
   }
 
   const htmlFileName = getFileNameFromUrl(url);
-  const htmlPath = path.join(outputDir, htmlFileName);
+  const resourcesDirName = htmlFileName.replace(/\.html$/, '_files');
+  const resourcesDirPath = path.join(outputDir, resourcesDirName);
+  const htmlFilePath = path.join(outputDir, htmlFileName);
 
-  const resourcesFolderName = getResourcesFolderName(url);
-  const resourcesDir = path.join(outputDir, resourcesFolderName);
-
+  debug('Enviando solicitud HTTP para obtener el HTML...');
+  let response;
   try {
-    log('Enviando solicitud HTTP para obtener el HTML...');
-    const response = await axios.get(url);
-    log('Página descargada correctamente');
-    log('Creando carpeta de recursos en:', resourcesDir);
-    await mkdir(resourcesDir, { recursive: true });
-
-    log('Iniciando descarga de recursos locales...');
-
-    // Simulación simple de recursos
-    const resources = [
-      ['/assets/application.css', 'codica-la-assets-application.css'],
-      ['/packs/js/runtime.js', 'codica-la-packs-js-runtime.js'],
-      ['/assets/professions/nodejs.png', 'codica-la-assets-professions-nodejs.png'],
-    ];
-
-    const tasks = new Listr(
-      resources.map(([src, filename]) => ({
-        title: `Descargando recurso: ${src}`,
-        task: () => {
-          const resourceUrl = new URL(src, url).href;
-          const outputPath = path.join(resourcesDir, filename);
-          return downloadResource(resourceUrl, outputPath);
-        },
-      })),
-      { concurrent: true }
-    );
-
-    await tasks.run();
-
-    const updatedHtml = `
-      <html>
-        <head>
-          <link rel="stylesheet" href="${resourcesFolderName}/codica-la-assets-application.css">
-          <script src="${resourcesFolderName}/codica-la-packs-js-runtime.js"></script>
-        </head>
-        <body>
-          <img src="${resourcesFolderName}/codica-la-assets-professions-nodejs.png">
-        </body>
-      </html>
-    `;
-
-    log(`Guardando HTML en: ${htmlPath}`);
-    await writeFile(htmlPath, updatedHtml);
-    log(`Archivo HTML guardado en: ${htmlPath}`);
-
-    return htmlPath;
+    response = await axios.get(url);
   } catch (error) {
     if (error.response && error.response.status === 404) {
       throw new Error(`Error HTTP 404 al intentar acceder a ${url}`);
     }
-    if (error.code === 'EACCES') {
-      throw new Error(`Permiso denegado al intentar escribir en el directorio: ${outputDir}`);
-    }
     throw error;
   }
+
+  debug('Página descargada correctamente');
+
+  const $ = cheerio.load(response.data);
+  const resourceTags = [
+    { tag: 'link', attr: 'href' },
+    { tag: 'script', attr: 'src' },
+    { tag: 'img', attr: 'src' },
+  ];
+
+  const resources = [];
+  resourceTags.forEach(({ tag, attr }) => {
+    $(tag).each((_, el) => {
+      const resourceUrl = $(el).attr(attr);
+      if (resourceUrl && isLocalResource(resourceUrl, url)) {
+        resources.push({ tag, attr, resourceUrl });
+      }
+    });
+  });
+
+  debug(`Creando carpeta de recursos en: ${resourcesDirPath}`);
+  await mkdir(resourcesDirPath, { recursive: true });
+  debug('Iniciando descarga de recursos locales...');
+
+  const tasks = new Listr(
+    resources.map(({ resourceUrl }) => {
+      const fullUrl = new URL(resourceUrl, url).href;
+      const resourceFileName = getResourceName(fullUrl);
+      const resourceFilePath = path.join(resourcesDirPath, resourceFileName);
+
+      return {
+        title: `Descargando recurso: ${resourceUrl}`,
+        task: () => downloadResource(fullUrl, resourceFilePath),
+      };
+    }),
+    { concurrent: true }
+  );
+
+  await tasks.run();
+
+  const updatedHtml = $.html();
+  resources.forEach(({ resourceUrl }) => {
+    const fullUrl = new URL(resourceUrl, url).href;
+    const resourceFileName = getResourceName(fullUrl);
+    const newPath = path.join(resourcesDirName, resourceFileName);
+    resourceTags.forEach(({ tag, attr }) => {
+      $(tag).each((_, el) => {
+        if ($(el).attr(attr) === resourceUrl) {
+          $(el).attr(attr, newPath);
+        }
+      });
+    });
+  });
+
+  debug(`Guardando HTML en: ${htmlFilePath}`);
+  await fs.writeFile(htmlFilePath, $.html());
+  debug(`Archivo HTML guardado en: ${htmlFilePath}`);
+
+  return htmlFilePath;
 };
 
 export default pageLoader;
