@@ -49,19 +49,19 @@ describe("Page Loader - Manejo de errores y descarga HTML", () => {
       });
 
     const filePath = await pageLoader(url, tempDir);
-    const fileContent = await fs.readFile(filePath, "utf-8");
+    const fileContent = await fs.readFile(filePath.filepath, "utf-8");
 
-    expect(fileContent).toContain(`${expectedFilesDir}/site.com-assets-application.css`);
-    expect(fileContent).toContain(`${expectedFilesDir}/site.com-packs-js-runtime.js`);
-    expect(fileContent).toContain(`${expectedFilesDir}/site.com-assets-professions-nodejs.png`);
-  });
+    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-application.css`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site-com-packs-js-runtime.js`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-professions-nodejs.png`);
+      });
 
   test("Debe lanzar error si la página devuelve 404", async () => {
     const url = "https://site.com/pagina-invalida";
 
     nock("https://site.com").get("/pagina-invalida").reply(404);
 
-    await expect(pageLoader(url, tempDir)).rejects.toThrow(/Error HTTP 404/);
+    await expect(pageLoader(url, tempDir)).rejects.toThrow(/Request failed with status code 404/);
   });
 
   test("Debe lanzar error si no se puede escribir en el directorio", async () => {

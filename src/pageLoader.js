@@ -1,105 +1,97 @@
-import fs, { promises as fsp, constants } from 'fs';
-import path from 'path';
 import axios from 'axios';
+import path from 'path';
+import { promises as fs } from 'fs';
+import { URL } from 'url';
 import * as cheerio from 'cheerio';
-import { fileURLToPath } from 'url';
-import debugLib from 'debug';
+import debug from 'debug';
+import _ from 'lodash';
 import { Listr } from 'listr2';
+import {
+  urlToFilename, urlToDirname, getExtension, sanitizeOutputDir,
+} from './utils.js';
 
-const log = debugLib('page-loader');
+const log = debug('page-loader');
 
-const getFileNameFromUrl = (url) => {
-  const { hostname, pathname } = new URL(url);
-  const normalizedPath = pathname === '/' ? '' : pathname;
-  const name = `${hostname}${normalizedPath}`
-    .replace(/[^a-zA-Z0-9]/g, '-')
-    .replace(/-+$/, '');
-  return `${name}.html`;
-};
-
-const getResourceFileName = (resourceUrl, baseUrl) => {
-  const { hostname, pathname } = new URL(resourceUrl, baseUrl);
-  const ext = path.extname(pathname) || '.html';
-  const cleanedPath = pathname.replace(/^\/+/g, '').replace(/\//g, '-').replace(/[^a-zA-Z0-9.-]/g, '-');
-  return `${hostname}-${cleanedPath}`;
-};
-
-const isLocalResource = (url, baseUrl) => {
-  const resource = new URL(url, baseUrl);
-  const base = new URL(baseUrl);
-  return resource.hostname === base.hostname;
-};
-
-const pageLoader = async (url, outputDir = process.cwd()) => {
-  try {
-    await fsp.access(outputDir, constants.F_OK);
-  } catch {
-    throw new Error(`El directorio ${outputDir} no existe`);
-  }
-
-  log(`Iniciando descarga de: ${url}`);
-  log('Enviando solicitud HTTP para obtener el HTML...');
-
-  let response;
-  try {
-    response = await axios.get(url);
-  } catch (error) {
-    if (error.response && error.response.status === 404) {
-      throw new Error(`Error HTTP 404 al intentar acceder a ${url}`);
-    }
-    throw error;
-  }
-
-  const html = response.data;
-  log('Página descargada correctamente');
-  const $ = cheerio.load(html);
-  const baseUrl = new URL(url).origin;
-
-  const resources = [];
-  const tags = [
-    { tag: 'img', attr: 'src' },
-    { tag: 'link', attr: 'href' },
-    { tag: 'script', attr: 'src' }
-  ];
-
-  tags.forEach(({ tag, attr }) => {
-    $(tag).each((_, el) => {
-      const resourceUrl = $(el).attr(attr);
-      if (resourceUrl && isLocalResource(resourceUrl, url)) {
-        const filename = getResourceFileName(resourceUrl, url);
-        const fullPath = path.join(`${getFileNameFromUrl(url).replace('.html', '')}_files`, filename);
-        $(el).attr(attr, fullPath);
-        resources.push({ url: new URL(resourceUrl, baseUrl).href, filename });
+// 🔹 Procesa y reemplaza las URLs de recursos dentro del HTML
+const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets) => {
+  const $elements = $(tagName).toArray();
+  const elementsWithUrls = $elements
+    .map((element) => $(element))
+    .filter(($element) => $element.attr(attrName))
+    .map(($element) => {
+      try {
+        const absoluteUrl = new URL($element.attr(attrName), baseUrl);
+        return { $element, url: absoluteUrl };
+      } catch {
+        return null;
       }
-    });
+    })
+    .filter(Boolean)
+    .filter(({ url }) => url.origin === baseUrl.origin);
+
+  elementsWithUrls.forEach(({ $element, url }) => {
+    const slug = urlToFilename(`${url.hostname}${url.pathname}`);
+    const localPath = path.join(baseDirname, slug);
+    assets.push({ url, filename: slug });
+    $element.attr(attrName, localPath);
   });
-
-  const htmlFileName = getFileNameFromUrl(url);
-  const htmlFilePath = path.join(outputDir, htmlFileName);
-  const resourcesDir = path.join(outputDir, `${htmlFileName.replace('.html', '')}_files`);
-
-  await fsp.mkdir(resourcesDir, { recursive: true });
-  log(`Creando carpeta de recursos en: ${resourcesDir}`);
-
-  const tasks = new Listr(
-    resources.map(({ url: resourceUrl, filename }) => ({
-      title: `Descargando recurso: ${resourceUrl}`,
-      task: async () => {
-        const res = await axios.get(resourceUrl, { responseType: 'arraybuffer' });
-        const filepath = path.join(resourcesDir, filename);
-        await fsp.writeFile(filepath, res.data);
-      },
-    })),
-    { concurrent: true, exitOnError: false }
-  );
-
-  log('Iniciando descarga de recursos locales...');
-  await tasks.run();
-
-  await fsp.writeFile(htmlFilePath, $.html());
-  log(`Archivo HTML guardado en: ${htmlFilePath}`);
-
-  return htmlFilePath;
 };
 
-export default pageLoader;
+// 🔹 Obtiene y procesa todos los recursos del HTML
+const processResources = (baseUrl, baseDirname, html) => {
+  const $ = cheerio.load(html, { decodeEntities: false });
+  const assets = [];
+
+  processResource($, 'img', 'src', baseUrl, baseDirname, assets);
+  processResource($, 'link', 'href', baseUrl, baseDirname, assets);
+  processResource($, 'script', 'src', baseUrl, baseDirname, assets);
+
+  return { html: $.html(), assets };
+};
+
+// 🔹 Descarga un recurso individual
+const downloadAsset = (dirname, { url, filename }) =>
+  axios.get(url.toString(), { responseType: 'arraybuffer' })
+    .then((response) => {
+      const fullPath = path.join(dirname, filename);
+      return fs.writeFile(fullPath, response.data);
+    });
+
+// 🔹 Función principal
+const downloadPage = async (pageUrl, outputDirName = '') => {
+  outputDirName = sanitizeOutputDir(outputDirName);
+
+  log('url', pageUrl);
+  log('output', outputDirName);
+
+  const url = new URL(pageUrl);
+  const slug = `${url.hostname}${url.pathname}`;
+  const filename = urlToFilename(slug);
+  const fullOutputDirname = path.resolve(process.cwd(), outputDirName);
+  const extension = getExtension(filename) === '.html' ? '' : '.html';
+  const fullOutputFilename = path.join(fullOutputDirname, `${filename}${extension}`);
+  const assetsDirname = urlToDirname(slug);
+  const fullOutputAssetsDirname = path.join(fullOutputDirname, assetsDirname);
+
+  let data;
+
+  await fs.access(fullOutputDirname).catch(() => fs.mkdir(fullOutputDirname, { recursive: true }));
+
+  const html = await axios.get(pageUrl).then((res) => res.data);
+  data = processResources(url, assetsDirname, html); // url completo
+
+  await fs.mkdir(fullOutputAssetsDirname, { recursive: true });
+  await fs.writeFile(fullOutputFilename, data.html);
+
+  const tasks = data.assets.map((asset) => ({
+    title: asset.url.toString(),
+    task: () => downloadAsset(fullOutputAssetsDirname, asset).catch(_.noop),
+  }));
+
+  const listr = new Listr(tasks, { concurrent: true });
+  await listr.run();
+
+  return { filepath: fullOutputFilename };
+};
+
+export default downloadPage;
