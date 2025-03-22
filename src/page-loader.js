@@ -46,15 +46,12 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
     return htmlPath;
   } catch (error) {
     if (error.response && error.response.status === 404) {
-      console.error(`Error HTTP 404 al intentar acceder a ${url}`);
-      process.exit(1);
+      throw new Error(`Error HTTP 404 al intentar acceder a ${url}`);
     }
     if (error.code === 'EACCES') {
-      console.error(`Permiso denegado al intentar escribir en el directorio: ${outputDir}`);
-      process.exit(1);
+      throw new Error(`Permiso denegado al intentar escribir en el directorio: ${outputDir}`);
     }
-    console.error(`Error al descargar la página: ${error.message}`);
-    process.exit(1);
+    throw new Error(`Error general: ${error.message}`);
   }
 };
 
