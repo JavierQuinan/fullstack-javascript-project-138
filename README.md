@@ -25,3 +25,9 @@ Este proyecto usa la biblioteca [`debug`](https://www.npmjs.com/package/debug) p
 
 ```bash
 DEBUG=page-loader,axios,nock.* npm test
+
+## Ejemplo de Error en la Ejecución
+
+Este proyecto maneja errores de red y de sistema de archivos. A continuación, se muestra una ejecución donde ocurre un error:
+
+[![asciicast](https://asciinema.org/a/P5fEroeHCnoqh26Fno9jL2Amb.svg)](https://asciinema.org/a/P5fEroeHCnoqh26Fno9jL2Amb)
