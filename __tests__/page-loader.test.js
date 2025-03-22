@@ -16,7 +16,7 @@ describe("Page Loader - Manejo de errores y descarga HTML", () => {
     const expectedFilename = "site-com-blog-about.html";
     const expectedFilesDir = "site-com-blog-about_files";
 
-    // Simulación del HTML con recursos locales
+    // HTML simulado con recursos locales
     nock("https://site.com")
       .get("/blog/about")
       .reply(
@@ -34,7 +34,7 @@ describe("Page Loader - Manejo de errores y descarga HTML", () => {
       `
       );
 
-    // Simulación de recursos locales
+    // Recursos locales simulados
     nock("https://site.com")
       .get("/assets/application.css")
       .reply(200, "body { background-color: red; }");
@@ -52,9 +52,9 @@ describe("Page Loader - Manejo de errores y descarga HTML", () => {
     const filePath = await pageLoader(url, tempDir);
     const fileContent = await fs.readFile(filePath, "utf-8");
 
-    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-application.css`);
-    expect(fileContent).toContain(`${expectedFilesDir}/site-com-packs-js-runtime.js`);
-    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-professions-nodejs.png`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-application-css`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site-com-packs-js-runtime-js`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-professions-nodejs-png`);
   });
 
   test("Debe lanzar error si la página devuelve 404", async () => {
