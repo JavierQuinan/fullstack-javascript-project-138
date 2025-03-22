@@ -34,4 +34,11 @@ Este proyecto incluye manejo de errores para situaciones como:
 
 [![asciinema](https://asciinema.org/a/P5fEroeHCnoqh26Fno9jL2Amb.svg)](https://asciinema.org/a/P5fEroeHCnoqh26Fno9jL2Amb)
 
+## 🎥 Ejemplo de Instalación y Funcionamiento
+
+Este proyecto permite descargar páginas web junto a sus recursos locales y mostrar el progreso de descarga usando `listr`.
+
+A continuación, un ejemplo de ejecución grabado con [Asciinema](https://asciinema.org):
+
+[![asciicast](https://asciinema.org/a/KcmtDLd5wd8ZvyOesCHiOZM94.svg)](https://asciinema.org/a/KcmtDLd5wd8ZvyOesCHiOZM94)
 
