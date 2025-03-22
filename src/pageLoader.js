@@ -57,44 +57,40 @@ const downloadAsset = (dirname, { url, filename }) => {
 // 🔹 Función principal para descargar una página
 const downloadPage = async (pageUrl, outputDirName = '') => {
   outputDirName = sanitizeOutputDir(outputDirName);
-  log('url', pageUrl);
-  log('output', outputDirName);
+  const fullOutputDirname = path.resolve(process.cwd(), outputDirName); // ✅ Resolución antes del chequeo
 
-  // ✅ Verifica si el directorio existe antes de continuar
+  log('url', pageUrl);
+  log('output', fullOutputDirname);
+
+  // ✅ Verifica si el directorio resuelto existe
   try {
-    await fs.access(outputDirName);
+    await fs.access(fullOutputDirname);
   } catch (error) {
-    throw new Error(`El directorio ${outputDirName} no existe`);
+    throw new Error(`El directorio ${fullOutputDirname} no existe`);
   }
 
   const url = new URL(pageUrl);
   const slug = `${url.hostname}${url.pathname}`;
   const filename = urlToFilename(slug);
-  const fullOutputDirname = path.resolve(process.cwd(), outputDirName);
   const extension = getExtension(filename) === '.html' ? '' : '.html';
   const fullOutputFilename = path.join(fullOutputDirname, `${filename}${extension}`);
   const assetsDirname = urlToDirname(slug);
   const fullOutputAssetsDirname = path.join(fullOutputDirname, assetsDirname);
 
-  let data;
-  await fs.access(fullOutputDirname).catch(() => fs.mkdir(fullOutputDirname, { recursive: true }));
-
   const html = await axios.get(pageUrl).then((res) => res.data);
-  data = processResources(url, assetsDirname, html, slug);
+  const data = processResources(url, assetsDirname, html, slug);
 
   await fs.mkdir(fullOutputAssetsDirname, { recursive: true });
-
   await fs.writeFile(fullOutputFilename, data.html);
-  log(`Archivo HTML guardado en: ${fullOutputFilename}`);
 
   const tasks = data.assets.map((asset) => ({
     title: asset.url.toString(),
-    task: () => downloadAsset(fullOutputAssetsDirname, asset).catch(_.noop),
+    task: () => downloadAsset(fullOutputAssetsDirname, asset),
   }));
 
-  const listr = new Listr(tasks, { concurrent: true });
-  await listr.run();
+  await new Listr(tasks, { concurrent: true }).run();
 
+  log(`🎉 File successfully saved at: ${fullOutputFilename}`);
   return { filepath: fullOutputFilename };
 };
 
