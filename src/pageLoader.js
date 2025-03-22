@@ -16,31 +16,30 @@ import {
 const log = debug('page-loader');
 
 // 🔹 Procesa y reemplaza las URLs de recursos dentro del HTML
-const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets, slug) => {
+const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets) => {
   const $elements = $(tagName).toArray();
-  const elementsWithUrls = $elements
+
+  $elements
     .map((element) => $(element))
     .filter(($element) => $element.attr(attrName))
     .map(($element) => ({ $element, url: new URL($element.attr(attrName), baseUrl) }))
-    .filter(({ url }) => url.origin === baseUrl);
-
-  elementsWithUrls.forEach(({ $element, url }) => {
-    const fullUrlPath = `${url.hostname}${url.pathname}`;
-    const filename = urlToFilename(fullUrlPath);
-    const filepath = path.join(baseDirname, filename);
-    assets.push({ url, filename });
-    $element.attr(attrName, filepath);
-  });
+    .filter(({ url }) => url.origin === baseUrl)
+    .forEach(({ $element, url }) => {
+      const filename = urlToFilename(url.pathname); // solo pathname (sin hostname)
+      const filepath = path.join(baseDirname, filename); // ejemplo: site-com-blog-about_files/styles.css
+      assets.push({ url, filename });
+      $element.attr(attrName, filepath); // actualiza atributo en HTML
+    });
 };
 
 // 🔹 Obtiene y procesa todos los recursos del HTML
-const processResources = (baseUrl, baseDirname, html, slug) => {
+const processResources = (baseUrl, baseDirname, html) => {
   const $ = cheerio.load(html, { decodeEntities: false });
   const assets = [];
 
-  processResource($, 'img', 'src', baseUrl, baseDirname, assets, slug);
-  processResource($, 'link', 'href', baseUrl, baseDirname, assets, slug);
-  processResource($, 'script', 'src', baseUrl, baseDirname, assets, slug);
+  processResource($, 'img', 'src', baseUrl, baseDirname, assets);
+  processResource($, 'link', 'href', baseUrl, baseDirname, assets);
+  processResource($, 'script', 'src', baseUrl, baseDirname, assets);
 
   return { html: $.html(), assets };
 };
