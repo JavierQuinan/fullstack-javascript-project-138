@@ -13,7 +13,6 @@ describe("Page Loader - Manejo de errores y descarga HTML", () => {
 
   test("Debe descargar correctamente el HTML de la página", async () => {
     const url = "https://site.com/blog/about";
-    const expectedFilename = "site-com-blog-about.html";
     const expectedFilesDir = "site-com-blog-about_files";
 
     // HTML simulado con recursos locales
@@ -52,9 +51,9 @@ describe("Page Loader - Manejo de errores y descarga HTML", () => {
     const filePath = await pageLoader(url, tempDir);
     const fileContent = await fs.readFile(filePath, "utf-8");
 
-    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-application-css`);
-    expect(fileContent).toContain(`${expectedFilesDir}/site-com-packs-js-runtime-js`);
-    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-professions-nodejs-png`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site.com-assets-application.css`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site.com-packs-js-runtime.js`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site.com-assets-professions-nodejs.png`);
   });
 
   test("Debe lanzar error si la página devuelve 404", async () => {
@@ -70,8 +69,12 @@ describe("Page Loader - Manejo de errores y descarga HTML", () => {
 
     nock("https://site.com").get("/").reply(200, "<html></html>");
 
-    const invalidDir = "/root/protegido";
+    const protectedDir = await fs.mkdtemp(path.join(os.tmpdir(), "no-write-"));
+    await fs.chmod(protectedDir, 0o444); // Solo lectura
 
-    await expect(pageLoader(url, invalidDir)).rejects.toThrow(/EACCES|permiso/i);
+    await expect(pageLoader(url, protectedDir)).rejects.toThrow(/EACCES|permiso/i);
+
+    // Restaurar permisos para evitar errores en limpieza
+    await fs.chmod(protectedDir, 0o755);
   });
 });

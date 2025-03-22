@@ -1,94 +1,105 @@
-import axios from 'axios';
-import { promises as fs, constants } from 'fs';
+import fs, { promises as fsp, constants } from 'fs';
 import path from 'path';
-import { URL } from 'url';
-import Listr from 'listr';
+import axios from 'axios';
 import * as cheerio from 'cheerio';
-import debug from 'debug';
-import { getResourceFileName } from './utils.js';
+import { fileURLToPath } from 'url';
+import debugLib from 'debug';
+import { Listr } from 'listr2';
 
-const log = debug('page-loader');
+const log = debugLib('page-loader');
 
 const getFileNameFromUrl = (url) => {
   const { hostname, pathname } = new URL(url);
-  const cleanPath = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
-  const fullPath = path.join(hostname, cleanPath);
-  return fullPath.replace(/[^a-zA-Z0-9]/g, '-');
+  const normalizedPath = pathname === '/' ? '' : pathname;
+  const name = `${hostname}${normalizedPath}`
+    .replace(/[^a-zA-Z0-9]/g, '-')
+    .replace(/-+$/, '');
+  return `${name}.html`;
 };
 
-const isLocalResource = (link) => {
-  return link && !link.startsWith('http') && !link.startsWith('//') && !link.startsWith('data:');
+const getResourceFileName = (resourceUrl, baseUrl) => {
+  const { hostname, pathname } = new URL(resourceUrl, baseUrl);
+  const ext = path.extname(pathname) || '.html';
+  const cleanedPath = pathname.replace(/^\/+/g, '').replace(/\//g, '-').replace(/[^a-zA-Z0-9.-]/g, '-');
+  return `${hostname}-${cleanedPath}`;
+};
+
+const isLocalResource = (url, baseUrl) => {
+  const resource = new URL(url, baseUrl);
+  const base = new URL(baseUrl);
+  return resource.hostname === base.hostname;
 };
 
 const pageLoader = async (url, outputDir = process.cwd()) => {
   try {
-    // Verifica si el directorio existe
-    try {
-      await fs.access(outputDir, constants.W_OK);
-    } catch (error) {
-      if (error.code === 'EACCES') {
-        throw new Error(`Permiso denegado al intentar escribir en el directorio: ${outputDir}`);
-      }
-      throw error;
-    }
-    
+    await fsp.access(outputDir, constants.F_OK);
+  } catch {
+    throw new Error(`El directorio ${outputDir} no existe`);
+  }
 
-    log(`Iniciando descarga de: ${url}`);
-    log('Enviando solicitud HTTP para obtener el HTML...');
-    const response = await axios.get(url);
-    const html = response.data;
-    log('Página descargada correctamente');
+  log(`Iniciando descarga de: ${url}`);
+  log('Enviando solicitud HTTP para obtener el HTML...');
 
-    const htmlFileName = getFileNameFromUrl(url);
-    const resourcesFolderName = `${htmlFileName}_files`;
-    const resourcesDir = path.join(outputDir, resourcesFolderName);
-    const htmlFilePath = path.join(outputDir, `${htmlFileName}.html`);
-
-    log(`Creando carpeta de recursos en: ${resourcesDir}`);
-    await fs.mkdir(resourcesDir, { recursive: true });
-    log('Iniciando descarga de recursos locales...');
-
-    const $ = cheerio.load(html);
-    const resources = [];
-
-    $('link[href], script[src], img[src]').each((_, element) => {
-      const tag = element.name;
-      const attr = tag === 'link' ? 'href' : 'src';
-      const src = $(element).attr(attr);
-
-      if (isLocalResource(src)) {
-        const resourceUrl = new URL(src, url).href;
-        const resourceName = getResourceFileName(url, src);
-        const resourcePath = path.join(resourcesDir, resourceName);
-
-        resources.push({
-          title: `Descargando recurso: ${src}`,
-          task: async () => {
-            const res = await axios.get(resourceUrl, { responseType: 'arraybuffer' });
-            await fs.writeFile(resourcePath, res.data);
-            $(element).attr(attr, path.join(resourcesFolderName, resourceName));
-          }
-        });
-      }
-    });
-
-    const tasks = new Listr(resources, { concurrent: true });
-    await tasks.run();
-
-    const updatedHtml = $.html();
-    await fs.writeFile(htmlFilePath, updatedHtml);
-    log(`Archivo HTML guardado en: ${htmlFilePath}`);
-    return htmlFilePath;
-
+  let response;
+  try {
+    response = await axios.get(url);
   } catch (error) {
     if (error.response && error.response.status === 404) {
       throw new Error(`Error HTTP 404 al intentar acceder a ${url}`);
     }
-    if (error.code === 'EACCES') {
-      throw new Error(`Permiso denegado al intentar escribir en el directorio: ${outputDir}`);
-    }
     throw error;
   }
+
+  const html = response.data;
+  log('Página descargada correctamente');
+  const $ = cheerio.load(html);
+  const baseUrl = new URL(url).origin;
+
+  const resources = [];
+  const tags = [
+    { tag: 'img', attr: 'src' },
+    { tag: 'link', attr: 'href' },
+    { tag: 'script', attr: 'src' }
+  ];
+
+  tags.forEach(({ tag, attr }) => {
+    $(tag).each((_, el) => {
+      const resourceUrl = $(el).attr(attr);
+      if (resourceUrl && isLocalResource(resourceUrl, url)) {
+        const filename = getResourceFileName(resourceUrl, url);
+        const fullPath = path.join(`${getFileNameFromUrl(url).replace('.html', '')}_files`, filename);
+        $(el).attr(attr, fullPath);
+        resources.push({ url: new URL(resourceUrl, baseUrl).href, filename });
+      }
+    });
+  });
+
+  const htmlFileName = getFileNameFromUrl(url);
+  const htmlFilePath = path.join(outputDir, htmlFileName);
+  const resourcesDir = path.join(outputDir, `${htmlFileName.replace('.html', '')}_files`);
+
+  await fsp.mkdir(resourcesDir, { recursive: true });
+  log(`Creando carpeta de recursos en: ${resourcesDir}`);
+
+  const tasks = new Listr(
+    resources.map(({ url: resourceUrl, filename }) => ({
+      title: `Descargando recurso: ${resourceUrl}`,
+      task: async () => {
+        const res = await axios.get(resourceUrl, { responseType: 'arraybuffer' });
+        const filepath = path.join(resourcesDir, filename);
+        await fsp.writeFile(filepath, res.data);
+      },
+    })),
+    { concurrent: true, exitOnError: false }
+  );
+
+  log('Iniciando descarga de recursos locales...');
+  await tasks.run();
+
+  await fsp.writeFile(htmlFilePath, $.html());
+  log(`Archivo HTML guardado en: ${htmlFilePath}`);
+
+  return htmlFilePath;
 };
 
 export default pageLoader;
