@@ -14,3 +14,14 @@ Aquí tienes un ejemplo de cómo funciona `page-loader`:
 Aquí tienes un ejemplo de cómo `page-loader` ahora también descarga imágenes:
 
 [![asciinema](https://asciinema.org/a/ZsG2mAw1rFT2EccatYKWzVlj6.svg)](https://asciinema.org/a/ZsG2mAw1rFT2EccatYKWzVlj6)
+
+## 🐞 Debug y registro de logs
+
+Este proyecto usa la biblioteca [`debug`](https://www.npmjs.com/package/debug) para registrar eventos clave de ejecución. También se habilita el debug de `axios` y `nock`.
+
+### 🔍 Ejemplo de ejecución con debug:
+
+[![asciinema](https://asciinema.org/a/Tfr7ocBnCAWlRqIesfuohb3sx.svg)](https://asciinema.org/a/Tfr7ocBnCAWlRqIesfuohb3sx)
+
+```bash
+DEBUG=page-loader,axios,nock.* npm test
