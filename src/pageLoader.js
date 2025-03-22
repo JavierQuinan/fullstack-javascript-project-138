@@ -80,7 +80,7 @@ const downloadPage = async (pageUrl, outputDirName = '') => {
   const html = await axios.get(pageUrl).then((res) => res.data);
   data = processResources(url, assetsDirname, html); // url completo
 
-  await fs.mkdir(fullOutputAssetsDirname, { recursive: true });
+  await fs.access(fullOutputDirname);
   await fs.writeFile(fullOutputFilename, data.html);
 
   const tasks = data.assets.map((asset) => ({
