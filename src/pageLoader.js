@@ -38,6 +38,8 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
     await fs.mkdir(resourcesDir, { recursive: true });
 
     log('Iniciando descarga de recursos locales...');
+    // Aquí iría la lógica de procesamiento de recursos si se necesitara.
+    // Por ahora simplemente guardamos el HTML original
     await fs.writeFile(htmlPath, response.data);
 
     log(`Archivo HTML guardado en: ${htmlPath}`);

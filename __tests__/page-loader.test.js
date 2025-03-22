@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import os from "os";
 import path from "path";
 import nock from "nock";
-import pageLoader from "../src/page-loader.js";
+import pageLoader from '../src/pageLoader.js';
 
 describe("Page Loader - Manejo de errores y descarga HTML", () => {
   let tempDir;
@@ -31,7 +31,7 @@ describe("Page Loader - Manejo de errores y descarga HTML", () => {
 
     nock("https://ejemplo.com").get("/pagina-invalida").reply(404);
 
-    await expect(pageLoader(url, tempDir)).rejects.toThrow(/Respuesta HTTP 404/);
+    await expect(pageLoader(url, tempDir)).rejects.toThrow(/Error HTTP 404/);
   });
 
   test("Debe lanzar error si no se puede escribir en el directorio", async () => {
