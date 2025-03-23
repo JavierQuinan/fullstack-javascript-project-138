@@ -1,23 +1,23 @@
 import { promises as fs } from 'fs';
-import os from "os";
-import path from "path";
-import nock from "nock";
-import pageLoader from "../src/pageLoader.js";
+import os from 'os';
+import path from 'path';
+import nock from 'nock';
+import pageLoader from '../src/pageLoader.js';
 
-describe("Page Loader - Manejo de errores y descarga HTML", () => {
+describe('Page Loader - Manejo de errores y descarga HTML', () => {
   let tempDir;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "page-loader-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
   });
 
-  test("Debe descargar correctamente el HTML de la página", async () => {
-    const url = "https://site.com/blog/about";
-    const expectedFilesDir = "site-com-blog-about_files";
+  test('Debe descargar correctamente el HTML de la página', async () => {
+    const url = 'https://site.com/blog/about';
+    const expectedFilesDir = 'site-com-blog-about_files';
 
     // HTML simulado con recursos locales
-    nock("https://site.com")
-      .get("/blog/about")
+    nock('https://site.com')
+      .get('/blog/about')
       .reply(
         200,
         `
@@ -34,41 +34,42 @@ describe("Page Loader - Manejo de errores y descarga HTML", () => {
       );
 
     // Recursos locales simulados
-    nock("https://site.com")
-      .get("/assets/application.css")
-      .reply(200, "body { background-color: red; }");
+    nock('https://site.com')
+      .get('/assets/application.css')
+      .reply(200, 'body { background-color: red; }');
 
-    nock("https://site.com")
-      .get("/packs/js/runtime.js")
+    nock('https://site.com')
+      .get('/packs/js/runtime.js')
       .reply(200, "console.log('Hello World');");
 
-    nock("https://site.com")
-      .get("/assets/professions/nodejs.png")
-      .reply(200, "IMAGEN_BLOB", {
-        "Content-Type": "image/png",
+    nock('https://site.com')
+      .get('/assets/professions/nodejs.png')
+      .reply(200, 'IMAGEN_BLOB', {
+        'Content-Type': 'image/png',
       });
 
     const filePath = await pageLoader(url, tempDir);
-    const fileContent = await fs.readFile(filePath.filepath, "utf-8");
+    const fileContent = await fs.readFile(filePath.filepath, 'utf-8');
 
     expect(fileContent).toContain(`${expectedFilesDir}/application.css`);
     expect(fileContent).toContain(`${expectedFilesDir}/runtime.js`);
     expect(fileContent).toContain(`${expectedFilesDir}/nodejs.png`);
   });
-  test("Debe lanzar error si la página devuelve 404", async () => {
-    const url = "https://site.com/pagina-invalida";
 
-    nock("https://site.com").get("/pagina-invalida").reply(404);
+  test('Debe lanzar error si la página devuelve 404', async () => {
+    const url = 'https://site.com/pagina-invalida';
+
+    nock('https://site.com').get('/pagina-invalida').reply(404);
 
     await expect(pageLoader(url, tempDir)).rejects.toThrow(/Request failed with status code 404/);
   });
 
-  test("Debe lanzar error si no se puede escribir en el directorio", async () => {
-    const url = "https://site.com";
+  test('Debe lanzar error si no se puede escribir en el directorio', async () => {
+    const url = 'https://site.com';
 
-    nock("https://site.com").get("/").reply(200, "<html></html>");
+    nock('https://site.com').get('/').reply(200, '<html></html>');
 
-    const protectedDir = await fs.mkdtemp(path.join(os.tmpdir(), "no-write-"));
+    const protectedDir = await fs.mkdtemp(path.join(os.tmpdir(), 'no-write-'));
     await fs.chmod(protectedDir, 0o444); // Solo lectura
 
     await expect(pageLoader(url, protectedDir)).rejects.toThrow(/EACCES|permiso/i);
