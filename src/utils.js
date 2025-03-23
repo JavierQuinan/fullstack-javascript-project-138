@@ -1,25 +1,23 @@
 import path from 'path';
 
 // 🔹 Normaliza nombres eliminando caracteres no válidos
-const processName = (name, replacer = '-') => name
-  .replace(/[?&=]/g, '') // Elimina caracteres problemáticos para nombres de archivos
-  .match(/\w+/gi) // Extrae partes alfanuméricas del string
-  .join(replacer); // Une los valores con el `replacer`
+const processName = (name, replacer = '-') =>
+  name
+    .replace(/[?&=]/g, '') // Elimina caracteres problemáticos
+    .match(/\w+/gi) // Extrae partes alfanuméricas
+    .join(replacer); // Une con guiones
 
-// 🔹 Convierte una URL en un nombre de archivo seguro
+// 🔹 Convierte una URL en un nombre de archivo seguro (solo basename)
 export const urlToFilename = (link, defaultFormat = '.html') => {
-  const { dir, name, ext } = path.parse(link);
-  const slug = processName(path.join(dir, name));
+  const { name, ext } = path.parse(link); // ← quitamos el dir
   const format = ext || defaultFormat;
-
-  return `${slug}${format}`;
+  return `${name}${format}`;
 };
 
 // 🔹 Convierte una URL en un nombre de directorio seguro
 export const urlToDirname = (link, postfix = '_files') => {
   const { dir, name, ext } = path.parse(link);
   const slug = processName(path.join(dir, name, ext));
-
   return `${slug}${postfix}`;
 };
 

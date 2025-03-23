@@ -25,7 +25,7 @@ const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets) => 
     })
     .filter(({ url }) => url.origin === baseUrl.origin) // solo recursos locales
     .forEach(({ $element, url }) => {
-      const slug = `${url.hostname}${url.pathname}`; // site.com/assets/styles.css
+      const slug = urlToFilename(url.pathname);
       const filename = urlToFilename(slug); // site-com-assets-styles.css
       const filepath = path.join(baseDirname, filename);
       assets.push({ url, filename });
@@ -89,7 +89,7 @@ const downloadPage = async (pageUrl, outputDirName = '') => {
 
   await new Listr(tasks, { concurrent: true }).run();
 
-  log(`🎉 File successfully saved at: ${fullOutputFilename}`);
+  log(`File successfully saved at: ${fullOutputFilename}`);
   return { filepath: fullOutputFilename };
 };
 
