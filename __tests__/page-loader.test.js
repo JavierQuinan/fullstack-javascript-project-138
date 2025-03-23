@@ -52,10 +52,10 @@ describe('Page Loader - Manejo de errores y descarga HTML', () => {
     const result = await pageLoader(url, tempDir);
     const fileContent = await fs.readFile(result.filepath, 'utf-8');
 
-    expect(fileContent).toContain(`${expectedFilesDir}/application.css`);
-    expect(fileContent).toContain(`${expectedFilesDir}/runtime.js`);
-    expect(fileContent).toContain(`${expectedFilesDir}/nodejs.png`);
-  });
+    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-application.css`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site-com-packs-js-runtime.js`);
+    expect(fileContent).toContain(`${expectedFilesDir}/site-com-assets-professions-nodejs.png`);
+      });
 
   test('Debe lanzar error si la página devuelve 404', async () => {
     const url = 'https://site.com/pagina-invalida';
