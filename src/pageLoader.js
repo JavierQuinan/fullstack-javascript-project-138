@@ -5,6 +5,7 @@ import { URL } from 'url';
 import * as cheerio from 'cheerio';
 import debug from 'debug';
 import { Listr } from 'listr2';
+import _ from 'lodash';
 import {
   urlToFilename,
   urlToDirname,
