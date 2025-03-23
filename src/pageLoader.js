@@ -46,7 +46,7 @@ const processResources = (baseUrl, baseDirname, html) => {
 };
 
 const downloadAsset = (dirname, { url, filename }) => axios.get(
-  url.toString(), 
+  url.toString(),
   { responseType: 'arraybuffer' },
 ).then((response) => fs.writeFile(
   path.join(dirname, filename),
