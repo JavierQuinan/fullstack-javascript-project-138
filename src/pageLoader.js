@@ -24,7 +24,7 @@ const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets) => 
       const resourceUrl = new URL($element.attr(attrName), baseUrl);
       return { $element, url: resourceUrl };
     })
-    .filter(({ url }) => url.origin === baseUrl);
+    .filter(({ url }) => url.origin === baseUrl.origin);
 
   elementsWithUrls.forEach(({ $element, url }) => {
     const slug = urlToFilename(`${url.hostname}${url.pathname}`);
@@ -34,21 +34,24 @@ const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets) => 
   });
 };
 
-const processResources = (baseUrl, baseDirname, html, slugPrefix = '') => {
+const processResources = (baseUrl, baseDirname, html) => {
   const $ = cheerio.load(html, { decodeEntities: false });
   const assets = [];
 
-  processResource($, 'img', 'src', baseUrl, baseDirname, assets, slugPrefix);
-  processResource($, 'link', 'href', baseUrl, baseDirname, assets, slugPrefix);
-  processResource($, 'script', 'src', baseUrl, baseDirname, assets, slugPrefix);
+  processResource($, 'img', 'src', baseUrl, baseDirname, assets);
+  processResource($, 'link', 'href', baseUrl, baseDirname, assets);
+  processResource($, 'script', 'src', baseUrl, baseDirname, assets);
 
   return { html: $.html(), assets };
 };
 
-const downloadAsset = (dirname, { url, filename }) =>
-  axios.get(url.toString(), { responseType: 'arraybuffer' }).then((response) =>
-    fs.writeFile(path.join(dirname, filename), response.data)
-  );
+const downloadAsset = (dirname, { url, filename }) => axios.get(
+  url.toString(), 
+  { responseType: 'arraybuffer' },
+).then((response) => fs.writeFile(
+  path.join(dirname, filename),
+  response.data,
+));
 
 const downloadPage = async (pageUrl, outputDirName = '') => {
   const safeOutputDirName = sanitizeOutputDir(outputDirName);
@@ -63,7 +66,7 @@ const downloadPage = async (pageUrl, outputDirName = '') => {
   const extension = getExtension(filename) === '.html' ? '' : '.html';
   const fullOutputFilename = path.join(
     fullOutputDirname,
-    `${filename}${extension}`
+    `${filename}${extension}`,
   );
   const assetsDirname = urlToDirname(slug);
   const fullOutputAssetsDirname = path.join(fullOutputDirname, assetsDirname);
@@ -73,7 +76,7 @@ const downloadPage = async (pageUrl, outputDirName = '') => {
   });
 
   const html = await axios.get(pageUrl).then((res) => res.data);
-  const data = processResources(url.origin, assetsDirname, html, slug);
+  const data = processResources(url, assetsDirname, html);
 
   await fs.mkdir(fullOutputAssetsDirname, { recursive: true });
   await fs.writeFile(fullOutputFilename, data.html);
