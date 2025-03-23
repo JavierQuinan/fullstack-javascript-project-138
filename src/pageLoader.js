@@ -27,7 +27,8 @@ const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets) => 
     .filter(({ url }) => url.origin === baseUrl.origin);
 
   elementsWithUrls.forEach(({ $element, url }) => {
-    const slug = urlToFilename(url.href); // Cambia aquí para usar url.href    const filepath = path.join(baseDirname, slug);
+    const slug = urlToFilename(`${url.hostname}${url.pathname}`);
+    const filepath = path.join(baseDirname, slug);
     assets.push({ url, filename: slug });
     $element.attr(attrName, filepath);
   });
