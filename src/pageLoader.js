@@ -4,7 +4,6 @@ import { promises as fs } from 'fs';
 import { URL } from 'url';
 import * as cheerio from 'cheerio';
 import debug from 'debug';
-import _ from 'lodash';
 import { Listr } from 'listr2';
 import {
   urlToFilename,
@@ -33,7 +32,6 @@ const processResource = ($, tagName, attrName, baseUrl, baseDirname, assets) => 
     $element.attr(attrName, filepath);
   });
 };
-
 
 const processResources = (baseUrl, baseDirname, html, slugPrefix = '') => {
   const $ = cheerio.load(html, { decodeEntities: false });

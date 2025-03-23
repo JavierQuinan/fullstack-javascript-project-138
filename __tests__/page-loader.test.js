@@ -1,3 +1,4 @@
+/* eslint-env jest */
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
@@ -30,7 +31,7 @@ describe('Page Loader - Manejo de errores y descarga HTML', () => {
             <img src="/assets/professions/nodejs.png">
           </body>
         </html>
-      `
+      `,
       );
 
     // Recursos locales simulados
@@ -40,7 +41,7 @@ describe('Page Loader - Manejo de errores y descarga HTML', () => {
 
     nock('https://site.com')
       .get('/packs/js/runtime.js')
-      .reply(200, "console.log('Hello World');");
+      .reply(200, 'console.log(\'Hello World\');');
 
     nock('https://site.com')
       .get('/assets/professions/nodejs.png')
@@ -48,8 +49,8 @@ describe('Page Loader - Manejo de errores y descarga HTML', () => {
         'Content-Type': 'image/png',
       });
 
-    const filePath = await pageLoader(url, tempDir);
-    const fileContent = await fs.readFile(filePath.filepath, 'utf-8');
+    const result = await pageLoader(url, tempDir);
+    const fileContent = await fs.readFile(result.filepath, 'utf-8');
 
     expect(fileContent).toContain(`${expectedFilesDir}/application.css`);
     expect(fileContent).toContain(`${expectedFilesDir}/runtime.js`);
@@ -74,7 +75,6 @@ describe('Page Loader - Manejo de errores y descarga HTML', () => {
 
     await expect(pageLoader(url, protectedDir)).rejects.toThrow(/EACCES|permiso/i);
 
-    // Restaurar permisos para evitar errores en limpieza
     await fs.chmod(protectedDir, 0o755);
   });
 });
