@@ -1,12 +1,11 @@
+/* eslint-env jest */
 {
-    "extends": ["eslint:recommended", "plugin:prettier/recommended"],
-    "env": {
-      "node": true,
-      "es6": true,
-      "jest": true
-    },
-    "rules": {
-      "prettier/prettier": "error"
-    }
-  }
-  
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true,
+    "jest/globals": true
+  },
+  "extends": "eslint:recommended",
+  "plugins": ["jest"],
+}

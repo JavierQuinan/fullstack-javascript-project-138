@@ -1,4 +1,4 @@
-import { promises as fs, constants } from "fs";
+import { promises as fs } from 'fs';
 import os from "os";
 import path from "path";
 import nock from "nock";

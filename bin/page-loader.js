@@ -2,13 +2,9 @@
 
 import { Command } from "commander";
 import pageLoader from "../src/pageLoader.js";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
 import run from '../src/cli.js';
 
 run();
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const program = new Command();
 
