@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📥 Page Loader
+#  Page Loader
 
 [![Actions Status](https://github.com/JavierQuinan/fullstack-javascript-project-138/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/JavierQuinan/fullstack-javascript-project-138/actions)
 [![Maintainability](https://img.shields.io/badge/maintainability-A-green.svg)](https://github.com/JavierQuinan/fullstack-javascript-project-138)
@@ -17,7 +17,7 @@
 
 <div align="center">
 
-### 🛠️ Stack Tecnológico
+###  Stack Tecnológico
 
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
@@ -29,47 +29,47 @@
 
 ---
 
-## 📋 Descripción
+##  Descripción
 
 **Page Loader** es una aplicación CLI profesional desarrollada en Node.js que permite descargar páginas web completas junto con todos sus recursos locales (imágenes, scripts CSS/JS, hojas de estilo). La herramienta procesa el HTML, identifica todos los recursos del mismo dominio y los descarga de manera eficiente, mostrando el progreso en tiempo real.
 
-## ✨ Características
+##  Características
 
-- 🌐 **Descarga completa de páginas web** con todos sus recursos locales
-- 📦 **Procesamiento automático de recursos**:
+-  **Descarga completa de páginas web** con todos sus recursos locales
+-  **Procesamiento automático de recursos**:
   - Imágenes (`<img src="...">`)
   - Hojas de estilo (`<link href="...">`)
   - Scripts JavaScript (`<script src="...">`)
-- 📊 **Barra de progreso visual** con Listr2 para seguimiento de descargas
-- 🔍 **Sistema de debug integrado** para monitoreo detallado
-- ⚠️ **Manejo robusto de errores** (404, permisos, red)
-- 🎨 **Salida coloreada** en consola con ansi-colors
-- 🔄 **Descargas concurrentes** para optimizar el rendimiento
-- 📝 **Nomenclatura segura de archivos** (sanitización de nombres)
-- 🛡️ **Validación de directorios** (previene escritura en rutas del sistema)
+-  **Barra de progreso visual** con Listr2 para seguimiento de descargas
+-  **Sistema de debug integrado** para monitoreo detallado
+-  **Manejo robusto de errores** (404, permisos, red)
+-  **Salida coloreada** en consola con ansi-colors
+-  **Descargas concurrentes** para optimizar el rendimiento
+-  **Nomenclatura segura de archivos** (sanitización de nombres)
+-  **Validación de directorios** (previene escritura en rutas del sistema)
 
-## 💼 Portafolio Profesional
+##  Portafolio Profesional
 
 Este proyecto incluye una **plantilla de portafolio profesional** moderna y completamente personalizable, perfecta para desarrolladores Full Stack que desean mostrar sus habilidades y proyectos.
 
-### 🎨 Características del Portafolio
+###  Características del Portafolio
 
-- **🌙 Diseño oscuro profesional** con gradientes modernos
-- **🎯 Stack tecnológico destacado** con badges animados (JavaScript, TypeScript, React, Node.js, MongoDB, etc.)
-- **📱 Diseño responsive** optimizado para móviles, tablets y escritorio
-- **✨ Efectos visuales modernos**:
+- ** Diseño oscuro profesional** con gradientes modernos
+- ** Stack tecnológico destacado** con badges animados (JavaScript, TypeScript, React, Node.js, MongoDB, etc.)
+- ** Diseño responsive** optimizado para móviles, tablets y escritorio
+- ** Efectos visuales modernos**:
   - Glassmorphism en cards y secciones
   - Animaciones suaves en hover
   - Gradientes dinámicos
   - Transiciones fluidas
-- **📂 Secciones completas**:
+- ** Secciones completas**:
   - Header con perfil y stack tecnológico
   - Sobre mí / About
   - Proyectos destacados con cards interactivas
   - Habilidades organizadas por categorías
   - Contacto con enlaces profesionales
 
-### 🚀 Demo del Portafolio
+###  Demo del Portafolio
 
 Puedes ver el portafolio de ejemplo en: [demo-captured/example.com.html](demo-captured/example.com.html)
 
@@ -83,7 +83,7 @@ start demo-captured/example.com.html
 open demo-captured/example.com.html
 ```
 
-### ✏️ Personalización
+###  Personalización
 
 El portafolio es completamente personalizable. Solo necesitas editar el HTML para:
 
@@ -107,7 +107,7 @@ El portafolio es completamente personalizable. Solo necesitas editar el HTML par
    - Ajustar tamaños y espaciados
    - Cambiar fuentes y estilos
 
-### 🎨 Paleta de Colores
+###  Paleta de Colores
 
 El portafolio usa una paleta moderna y profesional:
 
@@ -116,14 +116,14 @@ El portafolio usa una paleta moderna y profesional:
 - **Texto**: Tonos grises claros (`#e2e8f0`, `#cbd5e1`, `#94a3b8`)
 - **Cards**: Glassmorphism con transparencias
 
-### 📱 Responsive Design
+###  Responsive Design
 
 El portafolio se adapta automáticamente a:
-- 📱 Móviles (< 768px)
-- 📱 Tablets (768px - 1024px)
-- 💻 Escritorio (> 1024px)
+-  Móviles (< 768px)
+-  Tablets (768px - 1024px)
+-  Escritorio (> 1024px)
 
-## 🛠️ Tecnologías
+##  Tecnologías
 
 <div align="center">
 
@@ -160,7 +160,7 @@ El portafolio se adapta automáticamente a:
 
 ---
 
-## 📦 Instalación
+##  Instalación
 
 ### Requisitos Previos
 - Node.js v18 o superior
@@ -182,7 +182,7 @@ npm install
 npm link
 ```
 
-## 🚀 Uso
+##  Uso
 
 ### Sintaxis Básica
 
@@ -229,7 +229,7 @@ $env:DEBUG="page-loader"; page-loader https://ejemplo.com
 set DEBUG=page-loader && page-loader https://ejemplo.com
 ```
 
-## 📂 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 fullstack-javascript-project-138/
@@ -246,9 +246,9 @@ fullstack-javascript-project-138/
 └── package.json                # Dependencias y scripts
 ```
 
-## 🎯 Ejemplos
+##  Ejemplos
 
-### 📌 Descarga Básica
+###  Descarga Básica
 
 Ejemplo de cómo funciona `page-loader`:
 
@@ -256,19 +256,19 @@ Ejemplo de cómo funciona `page-loader`:
 
 ![image](https://github.com/user-attachments/assets/ede1c576-f516-430b-824a-33f09a6bc3b8)
 
-### 📌 Descarga con Imágenes
+###  Descarga con Imágenes
 
 Ejemplo de descarga de página con recursos gráficos:
 
 [![asciinema](https://asciinema.org/a/ZsG2mAw1rFT2EccatYKWzVlj6.svg)](https://asciinema.org/a/ZsG2mAw1rFT2EccatYKWzVlj6)
 
-### 🐞 Modo Debug
+###  Modo Debug
 
 Ejecución con logs de debug activados:
 
 [![asciinema](https://asciinema.org/a/Tfr7ocBnCAWlRqIesfuohb3sx.svg)](https://asciinema.org/a/Tfr7ocBnCAWlRqIesfuohb3sx)
 
-### 📉 Manejo de Errores
+###  Manejo de Errores
 
 El proyecto incluye manejo robusto de errores para:
 
@@ -287,7 +287,7 @@ Demo completa mostrando instalación y descarga con progreso visual:
 
 [![asciicast](https://asciinema.org/a/KcmtDLd5wd8ZvyOesCHiOZM94.svg)](https://asciinema.org/a/KcmtDLd5wd8ZvyOesCHiOZM94)
 
-## 🧪 Testing
+##  Testing
 
 ```bash
 # Ejecutar todos los tests
@@ -300,7 +300,7 @@ npm test -- --coverage
 npm test -- --watch
 ```
 
-## 🔍 Linting
+##  Linting
 
 ```bash
 # Ejecutar linter
@@ -310,7 +310,7 @@ npm run lint
 npm run lint -- --fix
 ```
 
-## 🤝 Contribuir
+##  Contribuir
 
 Las contribuciones son bienvenidas. Por favor:
 
@@ -320,7 +320,7 @@ Las contribuciones son bienvenidas. Por favor:
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-## 📝 Funcionalidades Técnicas
+##  Funcionalidades Técnicas
 
 - **Procesamiento HTML**: Utiliza Cheerio para parsear y modificar el DOM
 - **Gestión de URLs**: Convierte URLs en nombres de archivos seguros
@@ -329,11 +329,11 @@ Las contribuciones son bienvenidas. Por favor:
 - **Validación**: Sanitización de rutas y nombres de archivo
 - **Logging**: Sistema de debug granular con namespaces
 
-## 📄 Licencia
+##  Licencia
 
 Este proyecto está licenciado bajo la Licencia ISC.
 
-## 👤 Autor
+##  Autor
 
 <div align="center">
 
@@ -350,7 +350,7 @@ Este proyecto está licenciado bajo la Licencia ISC.
 
 ### ⭐ Si este proyecto te resulta útil, considera darle una estrella ⭐
 
-**Desarrollado con ❤️ por Francisco Quinteros**
+**Desarrollado por Francisco Quinteros**
 
 [![License](https://img.shields.io/badge/license-ISC-blue.svg?style=for-the-badge)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-v18+-339933.svg?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
