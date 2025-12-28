@@ -249,7 +249,7 @@ Este proyecto está licenciado bajo la Licencia ISC.
 
 **⭐ Si este proyecto te resulta útil, considera darle una estrella en GitHub ⭐**
 
-Desarrollado con ❤️ por Francisco Quinteros
+Desarrollado por Francisco Quinteros
 
 </div>
 
