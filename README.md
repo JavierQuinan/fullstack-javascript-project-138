@@ -34,7 +34,7 @@ Una herramienta de línea de comandos para descargar páginas web completas con 
 - 📝 **Nomenclatura segura de archivos** (sanitización de nombres)
 - 🛡️ **Validación de directorios** (previene escritura en rutas del sistema)
 
-## � Portafolio Profesional
+## 💼 Portafolio Profesional
 
 Este proyecto incluye una **plantilla de portafolio profesional** moderna y completamente personalizable, perfecta para desarrolladores Full Stack que desean mostrar sus habilidades y proyectos.
 
