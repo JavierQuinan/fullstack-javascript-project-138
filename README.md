@@ -34,7 +34,82 @@ Una herramienta de línea de comandos para descargar páginas web completas con 
 - 📝 **Nomenclatura segura de archivos** (sanitización de nombres)
 - 🛡️ **Validación de directorios** (previene escritura en rutas del sistema)
 
-## 🛠️ Tecnologías
+## � Portafolio Profesional
+
+Este proyecto incluye una **plantilla de portafolio profesional** moderna y completamente personalizable, perfecta para desarrolladores Full Stack que desean mostrar sus habilidades y proyectos.
+
+### 🎨 Características del Portafolio
+
+- **🌙 Diseño oscuro profesional** con gradientes modernos
+- **🎯 Stack tecnológico destacado** con badges animados (JavaScript, TypeScript, React, Node.js, MongoDB, etc.)
+- **📱 Diseño responsive** optimizado para móviles, tablets y escritorio
+- **✨ Efectos visuales modernos**:
+  - Glassmorphism en cards y secciones
+  - Animaciones suaves en hover
+  - Gradientes dinámicos
+  - Transiciones fluidas
+- **📂 Secciones completas**:
+  - Header con perfil y stack tecnológico
+  - Sobre mí / About
+  - Proyectos destacados con cards interactivas
+  - Habilidades organizadas por categorías
+  - Contacto con enlaces profesionales
+
+### 🚀 Demo del Portafolio
+
+Puedes ver el portafolio de ejemplo en: [demo-captured/example.com.html](demo-captured/example.com.html)
+
+Para visualizarlo, simplemente abre el archivo en tu navegador:
+
+```bash
+# Windows
+start demo-captured/example.com.html
+
+# Linux/macOS
+open demo-captured/example.com.html
+```
+
+### ✏️ Personalización
+
+El portafolio es completamente personalizable. Solo necesitas editar el HTML para:
+
+1. **Cambiar tu información personal**:
+   - Nombre y título profesional
+   - Descripción "Sobre mí"
+   - Enlaces de contacto (email, GitHub, LinkedIn)
+
+2. **Actualizar tus proyectos**:
+   - Añadir/eliminar project cards
+   - Modificar descripciones y tecnologías
+   - Actualizar enlaces a repositorios
+
+3. **Ajustar el stack tecnológico**:
+   - Modificar badges de tecnologías en el header
+   - Actualizar las secciones de habilidades
+   - Cambiar colores de badges
+
+4. **Personalizar el diseño**:
+   - Modificar colores del tema en el CSS
+   - Ajustar tamaños y espaciados
+   - Cambiar fuentes y estilos
+
+### 🎨 Paleta de Colores
+
+El portafolio usa una paleta moderna y profesional:
+
+- **Fondo**: Gradiente oscuro (`#0f172a` → `#1e293b`)
+- **Acento primario**: Azul (`#60a5fa`, `#3b82f6`, `#2563eb`)
+- **Texto**: Tonos grises claros (`#e2e8f0`, `#cbd5e1`, `#94a3b8`)
+- **Cards**: Glassmorphism con transparencias
+
+### 📱 Responsive Design
+
+El portafolio se adapta automáticamente a:
+- 📱 Móviles (< 768px)
+- 📱 Tablets (768px - 1024px)
+- 💻 Escritorio (> 1024px)
+
+## �🛠️ Tecnologías
 
 Este proyecto utiliza tecnologías modernas de JavaScript/Node.js:
 
