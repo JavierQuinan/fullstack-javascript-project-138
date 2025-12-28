@@ -1,15 +1,29 @@
-# 📥 Page Loader
-
 <div align="center">
+
+# 📥 Page Loader
 
 [![Actions Status](https://github.com/JavierQuinan/fullstack-javascript-project-138/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/JavierQuinan/fullstack-javascript-project-138/actions)
 [![Maintainability](https://img.shields.io/badge/maintainability-A-green.svg)](https://github.com/JavierQuinan/fullstack-javascript-project-138)
 [![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
 
-Una herramienta de línea de comandos para descargar páginas web completas con todos sus recursos locales (imágenes, scripts, estilos).
+**Una herramienta de línea de comandos profesional para descargar páginas web completas**
 
 [Características](#-características) • [Instalación](#-instalación) • [Uso](#-uso) • [Tecnologías](#-tecnologías) • [Ejemplos](#-ejemplos)
+
+</div>
+
+---
+
+<div align="center">
+
+### 🛠️ Stack Tecnológico
+
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
+![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
 
 </div>
 
@@ -111,32 +125,40 @@ El portafolio se adapta automáticamente a:
 
 ## 🛠️ Tecnologías
 
-Este proyecto utiliza tecnologías modernas de JavaScript/Node.js:
+<div align="center">
 
-### Core
-- **[Node.js](https://nodejs.org/)** (v18+) - Runtime de JavaScript
-- **[ES Modules](https://nodejs.org/api/esm.html)** - Sistema de módulos moderno
+### **Core**
 
-### Dependencias Principales
-- **[Axios](https://axios-http.com/)** v1.1.3 - Cliente HTTP para descargar páginas y recursos
-- **[Cheerio](https://cheerio.js.org/)** v1.0.0 - Manipulación y parsing de HTML (jQuery para Node.js)
-- **[Commander.js](https://github.com/tj/commander.js)** v12.1.0 - Framework para crear CLI
-- **[Listr2](https://github.com/cenk1cenk2/listr2)** v8.2.5 - Lista de tareas con barra de progreso
-- **[Lodash](https://lodash.com/)** v4.17.21 - Utilidades de JavaScript
-- **[Debug](https://github.com/debug-js/debug)** v4.4.0 - Sistema de logging y debugging
-- **[ansi-colors](https://github.com/doowb/ansi-colors)** v4.1.3 - Colores para terminal
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![ES Modules](https://img.shields.io/badge/ES_Modules-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://nodejs.org/api/esm.html)
 
-### Herramientas de Desarrollo
-- **[ESLint](https://eslint.org/)** v8.57.1 - Linter de código
-- **[Jest](https://jestjs.io/)** v29.7.0 - Framework de testing
-- **[Nock](https://github.com/nock/nock)** v13.5.6 - HTTP mocking para tests
-- **[TypeScript ESLint](https://typescript-eslint.io/)** v8.18.0 - Reglas de linting
-- **[Airbnb Style Guide](https://github.com/airbnb/javascript)** - Guía de estilo de código
+### **Dependencias Principales**
 
-### Otros
-- **[js-yaml](https://github.com/nodeca/js-yaml)** v4.1.0 - Parser de YAML
-- **[axios-debug-log](https://github.com/Gerhut/axios-debug-log)** v1.0.0 - Debug de peticiones HTTP
-- **[cross-env](https://github.com/kentcdodds/cross-env)** v7.0.3 - Variables de entorno multiplataforma
+[![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)](https://axios-http.com/)
+[![Cheerio](https://img.shields.io/badge/Cheerio-E88C18?style=for-the-badge&logo=javascript&logoColor=white)](https://cheerio.js.org/)
+[![Commander.js](https://img.shields.io/badge/Commander.js-00ADD8?style=for-the-badge&logo=gnu-bash&logoColor=white)](https://github.com/tj/commander.js)
+[![Listr2](https://img.shields.io/badge/Listr2-4FC08D?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/cenk1cenk2/listr2)
+[![Lodash](https://img.shields.io/badge/Lodash-3492FF?style=for-the-badge&logo=lodash&logoColor=white)](https://lodash.com/)
+[![Debug](https://img.shields.io/badge/Debug-CC6699?style=for-the-badge&logo=debug&logoColor=white)](https://github.com/debug-js/debug)
+[![ansi-colors](https://img.shields.io/badge/ansi--colors-FF6B6B?style=for-the-badge&logo=colors&logoColor=white)](https://github.com/doowb/ansi-colors)
+
+### **Herramientas de Desarrollo**
+
+[![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)
+[![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)
+[![Nock](https://img.shields.io/badge/Nock-00C7B7?style=for-the-badge&logo=insomnia&logoColor=white)](https://github.com/nock/nock)
+[![TypeScript ESLint](https://img.shields.io/badge/TS_ESLint-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://typescript-eslint.io/)
+[![Airbnb](https://img.shields.io/badge/Airbnb_Style-FF5A5F?style=for-the-badge&logo=airbnb&logoColor=white)](https://github.com/airbnb/javascript)
+
+### **Otros**
+
+[![js-yaml](https://img.shields.io/badge/js--yaml-4A90E2?style=for-the-badge&logo=yaml&logoColor=white)](https://github.com/nodeca/js-yaml)
+[![axios-debug-log](https://img.shields.io/badge/axios--debug-5A29E4?style=for-the-badge&logo=axios&logoColor=white)](https://github.com/Gerhut/axios-debug-log)
+[![cross-env](https://img.shields.io/badge/cross--env-00C853?style=for-the-badge&logo=dotenv&logoColor=white)](https://github.com/kentcdodds/cross-env)
+
+</div>
+
+---
 
 ## 📦 Instalación
 
@@ -313,18 +335,23 @@ Este proyecto está licenciado bajo la Licencia ISC.
 
 ## 👤 Autor
 
-**Francisco Quinteros** ([@Javier_Quinan](https://github.com/JavierQuinan))
+<div align="center">
 
-- GitHub: [@JavierQuinan](https://github.com/JavierQuinan)
-- Proyecto: [fullstack-javascript-project-138](https://github.com/JavierQuinan/fullstack-javascript-project-138)
+**Francisco Quinteros**
+
+[![GitHub](https://img.shields.io/badge/GitHub-JavierQuinan-181717?style=for-the-badge&logo=github)](https://github.com/JavierQuinan)
+[![Profile Views](https://img.shields.io/badge/Profile_Views-2.6K-green?style=for-the-badge)](https://github.com/JavierQuinan)
+
+</div>
 
 ---
 
 <div align="center">
 
-**⭐ Si este proyecto te resulta útil, considera darle una estrella en GitHub ⭐**
+### ⭐ Si este proyecto te resulta útil, considera darle una estrella ⭐
 
-Desarrollado por Francisco Quinteros
+**Desarrollado con ❤️ por Francisco Quinteros**
 
-</div>
+[![License](https://img.shields.io/badge/license-ISC-blue.svg?style=for-the-badge)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933.svg?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 
