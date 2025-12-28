@@ -109,7 +109,7 @@ El portafolio se adapta automáticamente a:
 - 📱 Tablets (768px - 1024px)
 - 💻 Escritorio (> 1024px)
 
-## �🛠️ Tecnologías
+## 🛠️ Tecnologías
 
 Este proyecto utiliza tecnologías modernas de JavaScript/Node.js:
 
