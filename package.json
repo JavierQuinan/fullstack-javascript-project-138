@@ -2,7 +2,7 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "type": "module",
-  "description": "[![Actions Status](https://github.com/JavierQuinan/fullstack-javascript-project-138/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/JavierQuinan/fullstack-javascript-project-138/actions)",
+  "description": "Node.js CLI that downloads an HTML page and its same-origin assets for local use.",
   "main": "src/pageLoader.js",
   "bin": {
     "page-loader": "./bin/page-loader.js"
@@ -13,9 +13,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://example.com"
+    "url": "git+https://github.com/JavierQuinan/fullstack-javascript-project-138.git"
   },
-  "author": "",
+  "author": "Francisco Quinteros",
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.16.0",
